@@ -29,22 +29,23 @@ export async function POST(request) {
     const { messages } = await request.json();
 
     const stream = await streamText({
-      model: google("gemini-1.0-pro"), // Ensure correct model name
+      model: google("gemini-2.5-flash-preview-04-17"),
       messages: buildGoogleGenAIPrompt(messages),
       temperature: 0.7,
       stream: true,
     });
-    return stream?.toDataStreamResponse();
 
-    //   return new NextResponse(response.body, { status: 200 });
-    // } catch (error) {
-    //   console.error("Gemini API Error:", error);
-    //   return new NextResponse(JSON.stringify({ error: error.message }), {
-    //     status: 500,
-    //     headers: { "Content-Type": "application/json" },
-    //   });
-    // }
+    return stream?.toDataStreamResponse();
   } catch (error) {
     console.error("Gemini API Error:", error);
+
+    return new Response(
+      JSON.stringify({ error: error.message || "Internal Server Error" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 }
+
